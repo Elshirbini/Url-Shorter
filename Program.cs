@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using UrlShorter.Common.Security;
 using UrlShorter.Modules.Users;
+using UrlShorter.Modules.Categories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +69,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpClient<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
 // ✅ Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -97,24 +100,21 @@ builder.Services.AddAuthentication(options =>
 
     options.Events = new JwtBearerEvents
     {
-        // 📌 قراءة التوكن من الكوكي
         OnMessageReceived = context =>
         {
             context.Token = context.Request.Cookies["accessToken"];
             return Task.CompletedTask;
         },
 
-        // 🔥 لو التوكن invalid أو expired
         OnAuthenticationFailed = context =>
         {
             Console.WriteLine("❌ Auth Failed: " + context.Exception.Message);
             return Task.CompletedTask;
         },
 
-        // 🔥 أهم جزء (ده اللي ناقص عندك)
         OnChallenge = context =>
         {
-            context.HandleResponse(); // ❗ يمنع default behavior
+            context.HandleResponse();
 
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
@@ -163,7 +163,8 @@ if (app.Environment.IsDevelopment())
 }
 
 // ✅ Middlewares
-app.UseHttpsRedirection();
+app.UseMiddleware<RequestLoggingMiddleware>();
+// app.UseHttpsRedirection();
 
 // ✅ Global Exception Handling
 app.UseMiddleware<ExceptionMiddleware>();
@@ -175,5 +176,18 @@ app.UseAuthorization();
 
 // ✅ Routing
 app.MapControllers();
+
+
+app.MapFallback(async context =>
+{
+    context.Response.StatusCode = 404;
+    context.Response.ContentType = "application/json";
+
+    await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
+    {
+        success = false,
+        message = "Route not found"
+    }));
+});
 
 app.Run();

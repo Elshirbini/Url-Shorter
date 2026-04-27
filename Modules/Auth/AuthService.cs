@@ -201,20 +201,15 @@ public class AuthService : IAuthService
             throw new BadRequestException("Passwords do not match");
 
         var user = await _db.Users
-            .FirstOrDefaultAsync(u => u.PasswordResetToken == dto.ResetToken);
-
-        if (user == null)
-            throw new BadRequestException("Invalid reset token");
+            .FirstOrDefaultAsync(u => u.PasswordResetToken == dto.ResetToken) ?? throw new BadRequestException("Invalid reset token");
 
         if (user.PasswordResetTokenExpire < DateTime.UtcNow)
             throw new BadRequestException("Reset token expired");
 
-        // 🔐 hash password
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
         user.Password = hashedPassword;
 
-        // cleanup
         user.PasswordResetToken = null;
         user.PasswordResetTokenExpire = null;
 
