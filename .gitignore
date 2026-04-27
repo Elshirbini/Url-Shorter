@@ -1,0 +1,21 @@
+# Build
+bin/
+obj/
+
+# User files
+*.user
+*.suo
+
+# IDE
+.vs/
+.vscode/
+
+# Logs
+*.log
+
+# Environment / secrets
+appsettings.Development.json
+appsettings.json
+
+# Optional
+Properties/launchSettings.json
