@@ -16,8 +16,6 @@ public class QueryParams
 
     public string? Search { get; set; }
 
-    public string? SortBy { get; set; } = "createdAt";
-
     public Guid? CategoryId { get; set; }
 
 }
