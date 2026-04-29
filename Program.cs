@@ -12,6 +12,7 @@ using System.Text;
 using UrlShorter.Common.Security;
 using UrlShorter.Modules.Users;
 using UrlShorter.Modules.Categories;
+using UrlShorter.Modules.Links;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +71,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpClient<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ILinkService, LinkService>();
+builder.Services.AddScoped<ILinkRedirectService, LinkRedirectService>();
 
 // ✅ Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -177,17 +180,5 @@ app.UseAuthorization();
 // ✅ Routing
 app.MapControllers();
 
-
-app.MapFallback(async context =>
-{
-    context.Response.StatusCode = 404;
-    context.Response.ContentType = "application/json";
-
-    await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
-    {
-        success = false,
-        message = "Route not found"
-    }));
-});
 
 app.Run();

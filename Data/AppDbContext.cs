@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using UrlShorter.Modules.Users.Models;
 using UrlShorter.Modules.Auth.Models;
 using UrlShorter.Modules.Categories.Models;
+using UrlShorter.Modules.Links.Models;
 
 namespace UrlShorter.Data;
 
@@ -9,6 +10,8 @@ public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     public DbSet<User> Users { get; set; }
+    public DbSet<Link> Links { get; set; }
+    public DbSet<Click> Clicks { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -36,6 +39,28 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Category>()
         .HasIndex(c => new { c.UserId, c.Name })
         .IsUnique();
+
+        modelBuilder.Entity<Link>()
+        .HasOne(c => c.User)
+        .WithMany(u => u.Links)
+        .HasForeignKey(c => c.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Link>()
+        .HasIndex(l => l.Code)
+        .IsUnique();
+
+        modelBuilder.Entity<Link>()
+            .HasOne(l => l.Category)
+            .WithMany()
+            .HasForeignKey(l => l.CategoryId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Click>()
+            .HasOne(c => c.Link)
+            .WithMany(l => l.ClicksHistory)
+            .HasForeignKey(c => c.LinkId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
 }

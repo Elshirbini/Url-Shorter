@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using UrlShorter.Modules.Categories.Models;
+using UrlShorter.Modules.Links.Models;
 
 namespace UrlShorter.Modules.Users.Models;
 
@@ -41,5 +42,6 @@ public class User
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<Category> Categories { get; set; } = new List<Category>();
+    public ICollection<Link> Links { get; set; } = new List<Link>();
 
 }

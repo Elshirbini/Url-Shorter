@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UrlShorter.Data;
@@ -11,9 +12,11 @@ using UrlShorter.Data;
 namespace UrlShorter.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260428111840_AddLinksAndClicks")]
+    partial class AddLinksAndClicks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,10 +107,6 @@ namespace UrlShorter.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("device_type");
 
-                    b.Property<string>("Ip")
-                        .HasColumnType("text")
-                        .HasColumnName("ip");
-
                     b.Property<Guid>("LinkId")
                         .HasColumnType("uuid")
                         .HasColumnName("link_id");
@@ -157,18 +156,12 @@ namespace UrlShorter.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
                     b.HasKey("LinkId");
 
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("Code")
                         .IsUnique();
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("links");
                 });
@@ -257,15 +250,7 @@ namespace UrlShorter.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("UrlShorter.Modules.Users.Models.User", "User")
-                        .WithMany("Links")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Category");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("UrlShorter.Modules.Links.Models.Link", b =>
@@ -276,8 +261,6 @@ namespace UrlShorter.Migrations
             modelBuilder.Entity("UrlShorter.Modules.Users.Models.User", b =>
                 {
                     b.Navigation("Categories");
-
-                    b.Navigation("Links");
                 });
 #pragma warning restore 612, 618
         }
