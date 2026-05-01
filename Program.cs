@@ -16,17 +16,24 @@ using UrlShorter.Modules.Links;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:5174") // allowed origin
+              .AllowCredentials()                   // allow cookies
+              .AllowAnyMethod()                     // GET, POST, etc.
+              .AllowAnyHeader();                    // headers
+    });
+});
+
 // ✅ Redis
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var options = new ConfigurationOptions
-    {
-        EndPoints = { "redis-14739.c326.us-east-1-3.ec2.cloud.redislabs.com:14739" },
-        Password = "I1dFZmeu9DIHLySOueXDXpOoTl04QH60",
-        User = "default",
-    };
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var connectionString = configuration.GetSection("Redis:ConnectionString").Value;
 
-    return ConnectionMultiplexer.Connect(options);
+    return ConnectionMultiplexer.Connect(connectionString!);
 });
 
 // ✅ DbContext
@@ -135,6 +142,9 @@ builder.Services.AddAuthentication(options =>
 
 
 var app = builder.Build();
+
+// Use CORS middleware
+app.UseCors("MyPolicy");
 
 using (var scope = app.Services.CreateScope())
 {
