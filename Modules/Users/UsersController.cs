@@ -41,7 +41,7 @@ public class UsersController : ControllerBase
     [HttpPatch("reset-password")]
     public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
     {
-        var result = await _userService.ResetPasswordAsync(GetUserId(), dto);
+        var result = await _userService.ResetPasswordAsync(HttpContext, GetUserId(), dto);
         return Ok(result);
     }
 }

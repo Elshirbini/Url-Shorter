@@ -56,7 +56,7 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<ApiResponse<object>> ResetPasswordAsync(Guid userId, ResetPasswordDto dto)
+    public async Task<ApiResponse<object>> ResetPasswordAsync(HttpContext context, Guid userId, ResetPasswordDto dto)
     {
         var user = await _db.Users.FindAsync(userId)
             ?? throw new NotFoundException("User not found");
@@ -69,6 +69,9 @@ public class UserService : IUserService
         user.Password = hashed;
 
         await _db.SaveChangesAsync();
+
+        context.Response.Cookies.Delete("accessToken");
+        context.Response.Cookies.Delete("refreshToken");
 
         return new ApiResponse<object>
         {

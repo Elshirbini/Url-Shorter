@@ -92,6 +92,10 @@ public class AuthService : IAuthService
             Secure = false,
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddMinutes(15)
+            // HttpOnly = true,
+            // Secure = true, 
+            // SameSite = SameSiteMode.None, 
+            // Expires = DateTime.UtcNow.AddDays(7)
         });
 
         context.Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
@@ -100,6 +104,10 @@ public class AuthService : IAuthService
             Secure = false,
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddDays(7)
+            // HttpOnly = true,
+            // Secure = true, 
+            // SameSite = SameSiteMode.None, 
+            // Expires = DateTime.UtcNow.AddDays(7)
         });
 
         return new ApiResponse<object>
@@ -263,11 +271,19 @@ public class AuthService : IAuthService
         context.Response.Cookies.Append("accessToken", newAccessToken, new CookieOptions
         {
             HttpOnly = true
+            // HttpOnly = true,
+            // Secure = true,
+            // SameSite = SameSiteMode.None, 
+            // Expires = DateTime.UtcNow.AddDays(7)
         });
 
         context.Response.Cookies.Append("refreshToken", newRefreshToken, new CookieOptions
         {
             HttpOnly = true
+            // HttpOnly = true,
+            // Secure = true, 
+            // SameSite = SameSiteMode.None, 
+            // Expires = DateTime.UtcNow.AddDays(7)
         });
 
         return new ApiResponse<object>
