@@ -12,18 +12,82 @@ using System.Text;
 using UrlShorter.Common.Security;
 using UrlShorter.Modules.Users;
 using UrlShorter.Modules.Categories;
-using UrlShorter.Modules.Links;
+using Serilog;
+using System.Threading.RateLimiting;
+using UrlShorter.Modules.Links.Application.UseCases;
+using UrlShorter.Modules.Links.Infrastructure.Repositories;
+using UrlShorter.Modules.Links.Application.Interfaces;
+using UrlShorter.Modules.Categories.Application.Interfaces;
+using UrlShorter.Modules.Categories.Infrastructure.Repositories;
+using UrlShorter.Common.Formatters;
+
+
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console(new PrettyJsonFormatter()).WriteTo.File(
+        new PrettyJsonFormatter(),
+        "logs/app-.log",
+        rollingInterval: RollingInterval.Day,
+        rollOnFileSizeLimit: true,
+        fileSizeLimitBytes: 20 * 1024 * 1024, //20MB
+        retainedFileCountLimit: 30)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("MyPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:5174") // allowed origin
+        policy.WithOrigins("http://localhost:5173") // allowed origin
               .AllowCredentials()                   // allow cookies
               .AllowAnyMethod()                     // GET, POST, etc.
               .AllowAnyHeader();                    // headers
+    });
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    // Default API Policy
+    options.GlobalLimiter =
+        PartitionedRateLimiter.Create<HttpContext, string>(
+            httpContext =>
+            {
+                var ip =
+                    httpContext.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown";
+
+                return RateLimitPartition.GetSlidingWindowLimiter(
+                    partitionKey: ip,
+                    factory: _ => new SlidingWindowRateLimiterOptions
+                    {
+                        PermitLimit = 100,
+                        Window = TimeSpan.FromMinutes(1),
+                        SegmentsPerWindow = 6,
+                        QueueLimit = 0
+                    });
+            });
+
+    // Auth Policy
+    options.AddPolicy("auth", httpContext =>
+    {
+        var ip =
+            httpContext.Connection.RemoteIpAddress?.ToString()
+            ?? "unknown";
+
+        return RateLimitPartition.GetSlidingWindowLimiter(
+            partitionKey: ip,
+            factory: _ => new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                SegmentsPerWindow = 6,
+
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
     });
 });
 
@@ -78,8 +142,15 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpClient<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ILinkService, LinkService>();
-builder.Services.AddScoped<ILinkRedirectService, LinkRedirectService>();
+builder.Services.AddScoped<IClickRepository, ClickRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ILinkRepository, LinkRepository>();
+builder.Services.AddScoped<RedirectLinkUseCase>();
+builder.Services.AddScoped<CreateLinkUseCase>();
+builder.Services.AddScoped<UpdateLinkUseCase>();
+builder.Services.AddScoped<DeleteLinkUseCase>();
+builder.Services.AddScoped<GetAllLinksUseCase>();
+builder.Services.AddScoped<GetLinkByIdUseCase>();
 
 // ✅ Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -186,6 +257,7 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseRateLimiter();
 
 // ✅ Routing
 app.MapControllers();

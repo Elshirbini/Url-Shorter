@@ -11,8 +11,8 @@ obj/
 .vscode/
 
 # Logs
-*.log
-
+/logs
+*logs
 # Environment / secrets
 appsettings.Development.json
 appsettings.json

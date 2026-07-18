@@ -69,10 +69,10 @@ public class AuthService : IAuthService
         var user = await _db.Users
             .FirstOrDefaultAsync(u =>
                 u.Email == dto.Identifier || u.UserName == dto.Identifier
-            ) ?? throw new UnauthorizedException("Invalid credentials");
+            ) ?? throw new UnauthorizedException("User not found");
 
         if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
-            throw new UnauthorizedException("Invalid credentials");
+            throw new UnauthorizedException("Wrong password");
 
         var accessToken = _tokenService.GenerateAccessToken(user);
         var (refreshToken, jti) = _tokenService.GenerateRefreshToken(user);

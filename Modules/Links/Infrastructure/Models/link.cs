@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using UrlShorter.Modules.Categories.Models;
+using UrlShorter.Modules.Categories.Infrastructure.Models;
 using UrlShorter.Modules.Users.Models;
 
-namespace UrlShorter.Modules.Links.Models;
+namespace UrlShorter.Modules.Links.Infrastructure.Models;
 
 [Table("links")]
 public class Link

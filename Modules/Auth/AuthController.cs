@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using UrlShorter.Modules.Auth.DTOs;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace UrlShorter.Modules.Auth;
 
 [ApiController]
 [Route("api/v1/[controller]")]
+[EnableRateLimiting("auth")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;

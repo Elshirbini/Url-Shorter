@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using UrlShorter.Modules.Users.Models;
 
-namespace UrlShorter.Modules.Categories.Models;
+namespace UrlShorter.Modules.Categories.Infrastructure.Models;
 
 [Table("categories")]
 public class Category

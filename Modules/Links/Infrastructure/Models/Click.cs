@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace UrlShorter.Modules.Links.Models;
+namespace UrlShorter.Modules.Links.Infrastructure.Models;
 
 [Table("clicks")]
 public class Click

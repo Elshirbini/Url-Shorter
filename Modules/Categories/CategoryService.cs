@@ -4,7 +4,7 @@ using UrlShorter.Common.Exceptions;
 using UrlShorter.Common.Responses;
 using UrlShorter.Data;
 using UrlShorter.Modules.Categories.DTOs;
-using UrlShorter.Modules.Categories.Models;
+using UrlShorter.Modules.Categories.Infrastructure.Models;
 
 namespace UrlShorter.Modules.Categories;
 
