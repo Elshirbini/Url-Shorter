@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using UrlShorter.Modules.Users.Models;
+using UrlShorter.Modules.Users.Infrastructure.Models;
 
 namespace UrlShorter.Modules.Categories.Infrastructure.Models;
 

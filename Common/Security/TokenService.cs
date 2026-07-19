@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using UrlShorter.Modules.Users.Models;
+using UrlShorter.Modules.Users.Infrastructure.Models;
 
 namespace UrlShorter.Common.Security;
 

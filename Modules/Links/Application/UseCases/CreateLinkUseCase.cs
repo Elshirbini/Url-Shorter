@@ -3,7 +3,7 @@ using UrlShorter.Common.Responses;
 using UrlShorter.Common.Security;
 using UrlShorter.Modules.Categories.Application.Interfaces;
 using UrlShorter.Modules.Links.Application.Interfaces;
-using UrlShorter.Modules.Links.DTOs;
+using UrlShorter.Modules.Links.Presentation.DTOs;
 using UrlShorter.Modules.Links.Infrastructure.Models;
 
 namespace UrlShorter.Modules.Links.Application.UseCases;

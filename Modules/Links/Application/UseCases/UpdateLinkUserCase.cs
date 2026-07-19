@@ -2,7 +2,7 @@ using UrlShorter.Common.Exceptions;
 using UrlShorter.Common.Responses;
 using UrlShorter.Modules.Categories.Application.Interfaces;
 using UrlShorter.Modules.Links.Application.Interfaces;
-using UrlShorter.Modules.Links.DTOs;
+using UrlShorter.Modules.Links.Presentation.DTOs;
 
 namespace UrlShorter.Modules.Links.Application.UseCases;
 

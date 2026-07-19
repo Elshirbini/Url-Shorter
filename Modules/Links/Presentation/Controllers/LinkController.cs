@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using UrlShorter.Common.DTOs;
 using UrlShorter.Modules.Links.Application.UseCases;
-using UrlShorter.Modules.Links.DTOs;
+using UrlShorter.Modules.Links.Presentation.DTOs;
 
 namespace UrlShorter.Modules.Links.Presentation.Controllers;
 

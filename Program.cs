@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using UrlShorter.Data;
 using StackExchange.Redis;
 using UrlShorter.Common.Services;
-using UrlShorter.Modules.Auth;
 using UrlShorter.Common.Middlewares;
 using UrlShorter.Common.Emails;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using UrlShorter.Common.Security;
-using UrlShorter.Modules.Users;
-using UrlShorter.Modules.Categories;
 using Serilog;
 using System.Threading.RateLimiting;
 using UrlShorter.Modules.Links.Application.UseCases;
@@ -20,6 +17,13 @@ using UrlShorter.Modules.Links.Application.Interfaces;
 using UrlShorter.Modules.Categories.Application.Interfaces;
 using UrlShorter.Modules.Categories.Infrastructure.Repositories;
 using UrlShorter.Common.Formatters;
+using UrlShorter.Modules.Categories.Application.UseCases;
+using UrlShorter.Modules.Users.Application.Interfaces;
+using UrlShorter.Modules.Users.Infrastructure.Repositories;
+using UrlShorter.Modules.Users.Application.UseCases;
+using UrlShorter.Modules.Auth.Infrastructure.Repositories;
+using UrlShorter.Modules.Auth.Application.Interfaces;
+using UrlShorter.Modules.Auth.Application.UseCases;
 
 
 
@@ -137,20 +141,39 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 // Services
 builder.Services.AddScoped<RedisService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpClient<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
+// repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IClickRepository, ClickRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ILinkRepository, LinkRepository>();
+// Link use cases
 builder.Services.AddScoped<RedirectLinkUseCase>();
 builder.Services.AddScoped<CreateLinkUseCase>();
 builder.Services.AddScoped<UpdateLinkUseCase>();
 builder.Services.AddScoped<DeleteLinkUseCase>();
-builder.Services.AddScoped<GetAllLinksUseCase>();
 builder.Services.AddScoped<GetLinkByIdUseCase>();
+builder.Services.AddScoped<GetAllLinksUseCase>();
+// category use cases
+builder.Services.AddScoped<CreateCategoryUseCase>();
+builder.Services.AddScoped<UpdateCategoryUseCase>();
+builder.Services.AddScoped<DeleteCategoryUseCase>();
+builder.Services.AddScoped<GetAllCategoriesUseCase>();
+// user use cases 
+builder.Services.AddScoped<GetUserUseCase>();
+builder.Services.AddScoped<UpdateUserNameUseCase>();
+builder.Services.AddScoped<ResetPasswordUseCase>();
+// auth use cases
+builder.Services.AddScoped<LoginUseCase>();
+builder.Services.AddScoped<SignupUseCase>();
+builder.Services.AddScoped<LogoutUseCase>();
+builder.Services.AddScoped<VerifyEmailUseCase>();
+builder.Services.AddScoped<ForgetPasswordUseCase>();
+builder.Services.AddScoped<VerifyCodeUseCase>();
+builder.Services.AddScoped<NewPasswordUseCase>();
+builder.Services.AddScoped<RefreshTokenUseCase>();
 
 // ✅ Swagger
 builder.Services.AddEndpointsApiExplorer();

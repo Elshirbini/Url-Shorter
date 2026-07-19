@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace UrlShorter.Modules.Links.DTOs;
+namespace UrlShorter.Modules.Links.Presentation.DTOs;
 
 public class UpdateLinkDto
 {

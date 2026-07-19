@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using UrlShorter.Modules.Users.Models;
-using UrlShorter.Modules.Auth.Models;
+using UrlShorter.Modules.Users.Infrastructure.Models;
+using UrlShorter.Modules.Auth.Infrastructure.Models;
 using UrlShorter.Modules.Categories.Infrastructure.Models;
 using UrlShorter.Modules.Links.Infrastructure.Models;
 
