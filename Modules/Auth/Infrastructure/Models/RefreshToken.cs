@@ -25,7 +25,7 @@ public class RefreshToken
     [Column("revoked_at")]
     public DateTime? RevokedAt { get; set; }
 
- 
+
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

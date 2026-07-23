@@ -15,11 +15,11 @@ public class GetAllLinksUseCase
     }
 
 
-        public async Task<ApiResponse<object>> GetAllAsync(Guid userId, QueryParams query)
+    public async Task<ApiResponse<object>> GetAllAsync(Guid userId, QueryParams query)
     {
 
-        var pagedLinks = await _linkRepository.GetLinks(new LinkFilter{ UserId = userId , CategoryId = query.CategoryId, Search = query.Search, Page = query.Page, PageSize = query.PageSize });
-        
+        var pagedLinks = await _linkRepository.GetLinks(new LinkFilter { UserId = userId, CategoryId = query.CategoryId, Search = query.Search, Page = query.Page, PageSize = query.PageSize });
+
         return new ApiResponse<object>
         {
             Success = true,

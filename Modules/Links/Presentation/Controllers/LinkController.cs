@@ -34,6 +34,7 @@ public class LinkController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Create([FromQuery] Guid? categoryId, CreateLinkDto dto)
     {
         var result = await _createLinkUseCase.CreateAsync(GetUserId(), categoryId, dto);

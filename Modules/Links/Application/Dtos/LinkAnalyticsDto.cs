@@ -1,4 +1,5 @@
 namespace UrlShorter.Modules.Links.Application.Dtos;
+
 public class LinkAnalyticsData
 {
     public List<RecentClickDto>? RecentClicks { get; set; }

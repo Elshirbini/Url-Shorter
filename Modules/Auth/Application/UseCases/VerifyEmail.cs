@@ -5,6 +5,7 @@ using UrlShorter.Common.Responses;
 using UrlShorter.Common.Services;
 using UrlShorter.Modules.Auth.Presentation.DTOs;
 using UrlShorter.Modules.Users.Application.Interfaces;
+using UrlShorter.Modules.Users.Infrastructure.Enums;
 using UrlShorter.Modules.Users.Infrastructure.Models;
 
 namespace UrlShorter.Modules.Auth.Application.UseCases;
@@ -33,6 +34,7 @@ public class VerifyEmailUseCase
             Email = parsed.Email,
             UserName = parsed.UserName,
             Password = hashedPassword,
+            Role = parsed.Role,
             CreatedAt = DateTime.UtcNow,
         };
 
@@ -53,6 +55,7 @@ public class VerifyEmailUseCase
         public string Email { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public UserRole Role { get; set; } = UserRole.User;
         public string Otp { get; set; } = string.Empty;
     }
 }

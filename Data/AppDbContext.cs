@@ -3,6 +3,7 @@ using UrlShorter.Modules.Users.Infrastructure.Models;
 using UrlShorter.Modules.Auth.Infrastructure.Models;
 using UrlShorter.Modules.Categories.Infrastructure.Models;
 using UrlShorter.Modules.Links.Infrastructure.Models;
+using UrlShorter.Modules.Users.Infrastructure.Enums;
 
 namespace UrlShorter.Data;
 
@@ -25,6 +26,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasIndex(u => u.UserName)
             .IsUnique();
+
+        modelBuilder.HasPostgresEnum<UserRole>();
 
         modelBuilder.Entity<RefreshToken>()
         .HasIndex(x => x.Jti)

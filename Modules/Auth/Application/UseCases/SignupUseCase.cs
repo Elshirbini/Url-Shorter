@@ -5,6 +5,7 @@ using UrlShorter.Common.Responses;
 using UrlShorter.Common.Services;
 using UrlShorter.Modules.Auth.Presentation.DTOs;
 using UrlShorter.Modules.Users.Application.Interfaces;
+using UrlShorter.Modules.Users.Infrastructure.Enums;
 
 namespace UrlShorter.Modules.Auth.Application.UseCases;
 
@@ -31,10 +32,17 @@ public class SignupUseCase
         }
 
         var otp = new Random().Next(100000, 999999).ToString();
+        var userData = new
+        {
+            Username = dto.UserName,
+            Email = dto.Email,
+            Password = dto.Password,
+            Role = UserRole.User
+        };
 
         await _redis.SetAsync(
             $"otp:{otp}",
-            JsonSerializer.Serialize(dto),
+            JsonSerializer.Serialize(userData),
             TimeSpan.FromMinutes(10)
         );
 

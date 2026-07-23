@@ -12,13 +12,13 @@ namespace UrlShorter.Modules.Users.Presentation;
 public class UsersController : ControllerBase
 {
     private readonly GetUserUseCase _getUserUseCase;
-    private readonly UpdateUserNameUseCase _updateUserNameUseCase;
+    private readonly UpdateUserProfileUseCase _updateUserProfileUseCase;
     private readonly ResetPasswordUseCase _resetPasswordUseCase;
 
-    public UsersController(GetUserUseCase getUserUseCase, UpdateUserNameUseCase updateUserNameUseCase, ResetPasswordUseCase resetPasswordUseCase)
+    public UsersController(GetUserUseCase getUserUseCase, UpdateUserProfileUseCase updateUserProfileUseCase, ResetPasswordUseCase resetPasswordUseCase)
     {
         _getUserUseCase = getUserUseCase;
-        _updateUserNameUseCase = updateUserNameUseCase;
+        _updateUserProfileUseCase = updateUserProfileUseCase;
         _resetPasswordUseCase = resetPasswordUseCase;
     }
 
@@ -37,9 +37,9 @@ public class UsersController : ControllerBase
     }
 
     [HttpPatch]
-    public async Task<IActionResult> UpdateUserName(UpdateUserNameDto dto)
+    public async Task<IActionResult> UpdateProfile([FromForm] UpdateUserProfileDto dto)
     {
-        var result = await _updateUserNameUseCase.UpdateUserNameAsync(GetUserId(), dto);
+        var result = await _updateUserProfileUseCase.UpdateProfileAsync(GetUserId(), dto);
         return Ok(result);
     }
 

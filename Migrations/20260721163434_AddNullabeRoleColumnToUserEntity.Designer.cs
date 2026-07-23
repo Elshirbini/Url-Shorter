@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UrlShorter.Data;
@@ -12,9 +13,11 @@ using UrlShorter.Modules.Users.Infrastructure.Enums;
 namespace UrlShorter.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260721163434_AddNullabeRoleColumnToUserEntity")]
+    partial class AddNullabeRoleColumnToUserEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -200,14 +203,6 @@ namespace UrlShorter.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("email");
 
-                    b.Property<string>("ImageKey")
-                        .HasColumnType("text")
-                        .HasColumnName("image_key");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("text")
-                        .HasColumnName("image_url");
-
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text")
@@ -221,7 +216,7 @@ namespace UrlShorter.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("password_reset_token_expire");
 
-                    b.Property<UserRole>("Role")
+                    b.Property<UserRole?>("Role")
                         .HasColumnType("user_role")
                         .HasColumnName("role");
 

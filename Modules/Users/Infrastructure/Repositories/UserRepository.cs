@@ -26,13 +26,6 @@ public class UserRepository : IUserRepository
     {
         return await _db.Users
             .Where(u => u.UserId == userId)
-            .Select(u => new User
-            {
-                UserId = u.UserId,
-                UserName = u.UserName,
-                Email = u.Email,
-                CreatedAt = u.CreatedAt
-            })
             .FirstOrDefaultAsync();
     }
     public async Task<User?> GetUserDocByIdAsync(Guid userId)

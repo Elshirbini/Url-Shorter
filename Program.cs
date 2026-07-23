@@ -24,6 +24,9 @@ using UrlShorter.Modules.Users.Application.UseCases;
 using UrlShorter.Modules.Auth.Infrastructure.Repositories;
 using UrlShorter.Modules.Auth.Application.Interfaces;
 using UrlShorter.Modules.Auth.Application.UseCases;
+using UrlShorter.Extensions;
+using UrlShorter.Common.Storage;
+using System.Text.Json.Serialization;
 
 
 
@@ -104,10 +107,8 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     return ConnectionMultiplexer.Connect(connectionString!);
 });
 
-// ✅ DbContext
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-);
+// ✅ Database
+builder.Services.AddDatabase(builder.Configuration);
 
 // ✅ Controllers
 builder.Services
@@ -115,6 +116,8 @@ builder.Services
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = false;
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter());
     });
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -139,10 +142,12 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     };
 });
 
+
 // Services
 builder.Services.AddScoped<RedisService>();
 builder.Services.AddHttpClient<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddStorage(builder.Configuration);
 // repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -163,7 +168,7 @@ builder.Services.AddScoped<DeleteCategoryUseCase>();
 builder.Services.AddScoped<GetAllCategoriesUseCase>();
 // user use cases 
 builder.Services.AddScoped<GetUserUseCase>();
-builder.Services.AddScoped<UpdateUserNameUseCase>();
+builder.Services.AddScoped<UpdateUserProfileUseCase>();
 builder.Services.AddScoped<ResetPasswordUseCase>();
 // auth use cases
 builder.Services.AddScoped<LoginUseCase>();
@@ -199,7 +204,8 @@ builder.Services.AddAuthentication(options =>
 
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(key)
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        RoleClaimType = "role"
     };
 
     options.Events = new JwtBearerEvents
@@ -215,6 +221,18 @@ builder.Services.AddAuthentication(options =>
             Console.WriteLine("❌ Auth Failed: " + context.Exception.Message);
             return Task.CompletedTask;
         },
+
+        OnForbidden = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        context.Response.ContentType = "application/json";
+
+        return context.Response.WriteAsJsonAsync(new
+        {
+            success = false,
+            message = "Forbidden. You don't have permission to access this resource."
+        });
+    },
 
         OnChallenge = context =>
         {

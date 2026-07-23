@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using UrlShorter.Modules.Categories.Infrastructure.Models;
 using UrlShorter.Modules.Links.Infrastructure.Models;
+using UrlShorter.Modules.Users.Infrastructure.Enums;
 
 namespace UrlShorter.Modules.Users.Infrastructure.Models;
 
@@ -24,8 +25,18 @@ public class User
     public string Email { get; set; } = string.Empty;
 
     [Required]
+    [Column("role")]
+    public UserRole Role { get; set; } = UserRole.User;
+
+    [Required]
     [Column("password")]
     public string Password { get; set; } = string.Empty;
+
+    [Column("image_url")]
+    public string? ImageUrl { get; set; }
+
+    [Column("image_key")]
+    public string? ImageKey { get; set; }
 
     [Column("code_validation")]
     public string? CodeValidation { get; set; }
