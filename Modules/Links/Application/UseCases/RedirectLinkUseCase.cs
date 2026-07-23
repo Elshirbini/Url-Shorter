@@ -15,9 +15,9 @@ namespace UrlShorter.Modules.Links.Application.UseCases
             _clickRepository = clickRepository;
         }
 
-        public async Task<string> RedirectAsync(string code, HttpContext context)
+        public async Task<string> RedirectAsync(string code, HttpContext context, CancellationToken cancellationToken = default)
         {
-            var link = await _linkRepository.GetFirstOrDefaultLinkAsync(l => l.Code == code)
+            var link = await _linkRepository.GetFirstOrDefaultLinkAsync(l => l.Code == code, cancellationToken)
                 ?? throw new NotFoundException("Link not found");
 
             var userAgent = context.Request.Headers.UserAgent.ToString();
@@ -34,11 +34,11 @@ namespace UrlShorter.Modules.Links.Application.UseCases
                 Ip = string.IsNullOrWhiteSpace(ip) ? "unknown" : ip
             };
 
-            await _clickRepository.AddClickAsync(click);
+            await _clickRepository.AddClickAsync(click, cancellationToken);
 
             link.Clicks += 1;
 
-            await _linkRepository.SaveChangesAsync();
+            await _linkRepository.SaveChangesAsync(cancellationToken);
 
             return link.RedirectUrl;
         }

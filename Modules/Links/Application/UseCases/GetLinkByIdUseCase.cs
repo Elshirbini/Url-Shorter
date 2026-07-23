@@ -17,15 +17,15 @@ public class GetLinkByIdUseCase
         _clickRepository = clickRepository;
     }
 
-    public async Task<ApiResponse<object>> GetByIdAsync(Guid userId, Guid linkId)
+    public async Task<ApiResponse<object>> GetByIdAsync(Guid userId, Guid linkId, CancellationToken cancellationToken = default)
     {
         //  get basic link data
-        var link = await _linkRepository.GetLinkAsync(linkId, userId)
+        var link = await _linkRepository.GetLinkAsync(linkId, userId, cancellationToken)
             ?? throw new NotFoundException("Link not found");
 
 
         //  base query for clicks
-        var analytics = await _clickRepository.GetClickAnalyticsAsync(linkId);
+        var analytics = await _clickRepository.GetClickAnalyticsAsync(linkId, cancellationToken);
 
 
         return new ApiResponse<object>

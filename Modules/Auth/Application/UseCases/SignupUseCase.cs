@@ -22,9 +22,9 @@ public class SignupUseCase
         _redis = redis;
     }
 
-    public async Task<ApiResponse<object>> SignupAsync(SignupDto dto)
+    public async Task<ApiResponse<object>> SignupAsync(SignupDto dto, CancellationToken cancellationToken = default)
     {
-        var exists = await _userRepository.UserExistsAsync(u => u.Email == dto.Email || u.UserName == dto.UserName);
+        var exists = await _userRepository.UserExistsAsync(u => u.Email == dto.Email || u.UserName == dto.UserName, cancellationToken);
 
         if (exists)
         {
@@ -43,10 +43,11 @@ public class SignupUseCase
         await _redis.SetAsync(
             $"otp:{otp}",
             JsonSerializer.Serialize(userData),
-            TimeSpan.FromMinutes(10)
+            TimeSpan.FromMinutes(10),
+            cancellationToken
         );
 
-        await _emailService.SendOtpAsync(dto.Email, otp);
+        await _emailService.SendOtpAsync(dto.Email, otp, cancellationToken);
 
 
         return new ApiResponse<object>

@@ -35,65 +35,65 @@ public class AuthController : ControllerBase
 
     // 🔐 LOGIN
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto dto)
+    public async Task<IActionResult> Login([FromBody] LoginDto dto, CancellationToken cancellationToken)
     {
-        var result = await _loginUseCase.LoginAsync(HttpContext, dto);
+        var result = await _loginUseCase.LoginAsync(HttpContext, dto, cancellationToken);
         return Ok(result);
     }
 
     // 📝 SIGNUP
     [HttpPost("signup")]
-    public async Task<IActionResult> Signup([FromBody] SignupDto dto)
+    public async Task<IActionResult> Signup([FromBody] SignupDto dto, CancellationToken cancellationToken)
     {
-        var result = await _signupUseCase.SignupAsync(dto);
+        var result = await _signupUseCase.SignupAsync(dto, cancellationToken);
         return Ok(result);
     }
 
     // 📩 VERIFY EMAIL (OTP)
     [HttpPost("verify-email")]
-    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailDto dto)
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailDto dto, CancellationToken cancellationToken)
     {
-        var result = await _verifyEmailUseCase.VerifyEmailAsync(dto);
+        var result = await _verifyEmailUseCase.VerifyEmailAsync(dto, cancellationToken);
         return Ok(result);
     }
 
     // 🔄 FORGET PASSWORD
     [HttpPost("forget-password")]
-    public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordDto dto)
+    public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordDto dto, CancellationToken cancellationToken)
     {
-        var result = await _forgetPasswordUseCase.ForgetPasswordAsync(dto);
+        var result = await _forgetPasswordUseCase.ForgetPasswordAsync(dto, cancellationToken);
         return Ok(result);
     }
 
     // 🔢 VERIFY CODE
     [HttpPost("verify-code")]
-    public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeDto dto)
+    public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeDto dto, CancellationToken cancellationToken)
     {
-        var result = await _verifyCodeUseCase.VerifyCodeAsync(dto);
+        var result = await _verifyCodeUseCase.VerifyCodeAsync(dto, cancellationToken);
         return Ok(result);
     }
 
     // 🔑 NEW PASSWORD
     [HttpPatch("new-password")]
-    public async Task<IActionResult> NewPassword([FromBody] NewPasswordDto dto)
+    public async Task<IActionResult> NewPassword([FromBody] NewPasswordDto dto, CancellationToken cancellationToken)
     {
-        var result = await _NewPasswordUseCase.ResetPasswordAsync(dto);
+        var result = await _NewPasswordUseCase.ResetPasswordAsync(dto, cancellationToken);
         return Ok(result);
     }
 
     // 🔄 REFRESH TOKEN
     [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshToken()
+    public async Task<IActionResult> RefreshToken(CancellationToken cancellationToken)
     {
-        var result = await _refreshTokenUseCase.RefreshTokenAsync(HttpContext);
+        var result = await _refreshTokenUseCase.RefreshTokenAsync(HttpContext, cancellationToken);
         return Ok(result);
     }
 
     // 🚪 LOGOUT
     [HttpPost("logout")]
-    public async Task<IActionResult> Logout()
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
-        var result = await _logoutUseCase.LogoutAsync(HttpContext);
+        var result = await _logoutUseCase.LogoutAsync(HttpContext, cancellationToken);
         return Ok(result);
     }
 }

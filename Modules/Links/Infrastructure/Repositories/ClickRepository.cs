@@ -14,7 +14,7 @@ class ClickRepository : IClickRepository
         _db = db;
     }
 
-    public async Task<LinkAnalyticsData> GetClickAnalyticsAsync(Guid linkId)
+    public async Task<LinkAnalyticsData> GetClickAnalyticsAsync(Guid linkId, CancellationToken cancellationToken = default)
     {
         var clicksQuery = _db.Clicks
             .Where(c => c.LinkId == linkId);
@@ -31,7 +31,7 @@ class ClickRepository : IClickRepository
                 Ip = c.Ip,
                 CreatedAt = c.CreatedAt
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
 
         //  device stats
@@ -42,7 +42,7 @@ class ClickRepository : IClickRepository
                 Device = g.Key,
                 Count = g.Count()
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
 
         //  top referers
@@ -56,7 +56,7 @@ class ClickRepository : IClickRepository
             })
             .OrderByDescending(x => x.Count)
             .Take(5)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
 
         //  unique visitors (by IP)
@@ -64,7 +64,7 @@ class ClickRepository : IClickRepository
             .Where(c => c.Ip != null)
             .Select(c => c.Ip)
             .Distinct()
-            .CountAsync();
+            .CountAsync(cancellationToken);
 
 
         // clicks by day (time series)
@@ -76,7 +76,7 @@ class ClickRepository : IClickRepository
                 Count = g.Count()
             })
             .OrderBy(x => x.Date)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
 
         // top IPs (abuse detection)
@@ -90,7 +90,7 @@ class ClickRepository : IClickRepository
             })
             .OrderByDescending(x => x.Count)
             .Take(5)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return new LinkAnalyticsData
         {
@@ -104,10 +104,10 @@ class ClickRepository : IClickRepository
     }
 
 
-    public async Task<Click> AddClickAsync(Click click)
+    public async Task<Click> AddClickAsync(Click click, CancellationToken cancellationToken = default)
     {
-        var clickEntity = await _db.Clicks.AddAsync(click);
-        await _db.SaveChangesAsync();
+        var clickEntity = await _db.Clicks.AddAsync(click, cancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
         return clickEntity.Entity;
     }
 }

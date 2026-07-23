@@ -27,6 +27,7 @@ using UrlShorter.Modules.Auth.Application.UseCases;
 using UrlShorter.Extensions;
 using UrlShorter.Common.Storage;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http.Features;
 
 
 
@@ -119,6 +120,12 @@ builder.Services
         options.JsonSerializerOptions.Converters.Add(
             new JsonStringEnumConverter());
     });
+
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MemoryBufferThreshold = 5 * 1024 * 1024;
+});
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {

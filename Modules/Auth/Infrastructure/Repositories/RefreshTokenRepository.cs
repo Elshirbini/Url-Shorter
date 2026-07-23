@@ -16,15 +16,15 @@ public class RefreshTokenRepository : IRefreshTokenRepository
         _db = db;
     }
 
-    public async Task<RefreshToken> SaveRefreshTokenAsync(RefreshToken refreshToken)
+    public async Task<RefreshToken> SaveRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default)
     {
-        var result = await _db.RefreshTokens.AddAsync(refreshToken);
-        await _db.SaveChangesAsync();
+        var result = await _db.RefreshTokens.AddAsync(refreshToken, cancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
         return result.Entity;
     }
 
-    public async Task<RefreshToken?> GetFirstOrDefaultRefreshTokenAsync(Expression<Func<RefreshToken, bool>> predicate)
+    public async Task<RefreshToken?> GetFirstOrDefaultRefreshTokenAsync(Expression<Func<RefreshToken, bool>> predicate, CancellationToken cancellationToken = default)
     {
-        return await _db.RefreshTokens.FirstOrDefaultAsync(predicate);
+        return await _db.RefreshTokens.FirstOrDefaultAsync(predicate, cancellationToken);
     }
 }

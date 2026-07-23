@@ -6,6 +6,6 @@ namespace UrlShorter.Modules.Links.Application.Interfaces;
 
 public interface IClickRepository
 {
-    Task<LinkAnalyticsData> GetClickAnalyticsAsync(Guid linkId);
-    Task<Click> AddClickAsync(Click click);
+    Task<LinkAnalyticsData> GetClickAnalyticsAsync(Guid linkId, CancellationToken cancellationToken = default);
+    Task<Click> AddClickAsync(Click click, CancellationToken cancellationToken = default);
 }

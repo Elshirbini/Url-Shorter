@@ -6,10 +6,10 @@ namespace UrlShorter.Modules.Users.Application.Interfaces;
 
 public interface IUserRepository
 {
-    Task<User> SaveUserAsync(User user);
-    Task<User?> GetUserByIdAsync(Guid userId);
-    Task<User?> GetUserDocByIdAsync(Guid userId);
-    Task<bool> UserExistsAsync(Expression<Func<User, bool>> predicate);
-    Task<User?> GetFirstOrDefaultUserAsync(Expression<Func<User, bool>> predicate);
-    Task SaveUserChangesAsync();
+    Task<User> SaveUserAsync(User user, CancellationToken cancellationToken = default);
+    Task<User?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<User?> GetUserDocByIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<bool> UserExistsAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default);
+    Task<User?> GetFirstOrDefaultUserAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default);
+    Task SaveUserChangesAsync(CancellationToken cancellationToken = default);
 }

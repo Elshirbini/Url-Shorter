@@ -32,30 +32,30 @@ public class CategoryController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] QueryParams query)
+    public async Task<IActionResult> GetAll([FromQuery] QueryParams query, CancellationToken cancellationToken)
     {
-        var result = await getAllCategoriesUseCase.GetAllAsync(GetUserId(), query);
+        var result = await getAllCategoriesUseCase.GetAllAsync(GetUserId(), query, cancellationToken);
         return Ok(result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CategoryDto dto)
+    public async Task<IActionResult> Create(CategoryDto dto, CancellationToken cancellationToken)
     {
-        var result = await createCategoryUseCase.CreateAsync(GetUserId(), dto);
+        var result = await createCategoryUseCase.CreateAsync(GetUserId(), dto, cancellationToken);
         return Ok(result);
     }
 
     [HttpPatch("{categoryId}")]
-    public async Task<IActionResult> Update(Guid categoryId, CategoryDto dto)
+    public async Task<IActionResult> Update(Guid categoryId, CategoryDto dto, CancellationToken cancellationToken)
     {
-        var result = await updateCategoryUseCase.UpdateAsync(GetUserId(), categoryId, dto);
+        var result = await updateCategoryUseCase.UpdateAsync(GetUserId(), categoryId, dto, cancellationToken);
         return Ok(result);
     }
 
     [HttpDelete("{categoryId}")]
-    public async Task<IActionResult> Delete(Guid categoryId)
+    public async Task<IActionResult> Delete(Guid categoryId, CancellationToken cancellationToken)
     {
-        var result = await deleteCategoryUseCase.DeleteAsync(GetUserId(), categoryId);
+        var result = await deleteCategoryUseCase.DeleteAsync(GetUserId(), categoryId, cancellationToken);
         return Ok(result);
     }
 }

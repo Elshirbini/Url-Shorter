@@ -17,7 +17,7 @@ public class LogoutUseCase
         _refreshTokenRepository = refreshTokenRepository;
     }
 
-    public async Task<ApiResponse<object>> LogoutAsync(HttpContext context)
+    public async Task<ApiResponse<object>> LogoutAsync(HttpContext context, CancellationToken cancellationToken = default)
     {
         var token = context.Request.Cookies["refreshToken"];
 
@@ -29,12 +29,12 @@ public class LogoutUseCase
             {
                 var jti = principal.FindFirst("jti")?.Value;
 
-                var stored = await _refreshTokenRepository.GetFirstOrDefaultRefreshTokenAsync(x => x.Jti == jti);
+                var stored = await _refreshTokenRepository.GetFirstOrDefaultRefreshTokenAsync(x => x.Jti == jti, cancellationToken);
 
                 if (stored != null)
                 {
                     stored.RevokedAt = DateTime.UtcNow;
-                    await _refreshTokenRepository.SaveRefreshTokenAsync(stored);
+                    await _refreshTokenRepository.SaveRefreshTokenAsync(stored, cancellationToken);
                 }
             }
         }

@@ -18,7 +18,7 @@ public class LinkRepository : ILinkRepository
         _db = db;
     }
 
-    public async Task<PagedResult<LinkListDto>> GetLinks(LinkFilter filter)
+    public async Task<PagedResult<LinkListDto>> GetLinks(LinkFilter filter, CancellationToken cancellationToken = default)
     {
 
         var linksQuery = _db.Links
@@ -42,7 +42,7 @@ public class LinkRepository : ILinkRepository
             );
         }
 
-        var total = await linksQuery.CountAsync();
+        var total = await linksQuery.CountAsync(cancellationToken);
 
         var data = await linksQuery
             .OrderByDescending(l => l.CreatedAt)
@@ -57,7 +57,7 @@ public class LinkRepository : ILinkRepository
                 CreatedAt = l.CreatedAt,
                 CategoryId = l.CategoryId
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return new PagedResult<LinkListDto>
         {
@@ -66,7 +66,7 @@ public class LinkRepository : ILinkRepository
         };
     }
 
-    public async Task<LinkListDto?> GetLinkAsync(Guid linkId, Guid userId)
+    public async Task<LinkListDto?> GetLinkAsync(Guid linkId, Guid userId, CancellationToken cancellationToken = default)
     {
         return await _db.Links
             .Where(l => l.LinkId == linkId && l.UserId == userId)
@@ -79,31 +79,31 @@ public class LinkRepository : ILinkRepository
                 CreatedAt = l.CreatedAt,
                 CategoryId = l.CategoryId
             })
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<bool> ExistsByQueryAsync(Expression<Func<Link, bool>> predicate)
+    public async Task<bool> ExistsByQueryAsync(Expression<Func<Link, bool>> predicate, CancellationToken cancellationToken = default)
     {
-        return await _db.Links.AnyAsync(predicate);
+        return await _db.Links.AnyAsync(predicate, cancellationToken);
     }
 
-    public async Task<Link> AddLinkAsync(Link link)
+    public async Task<Link> AddLinkAsync(Link link, CancellationToken cancellationToken = default)
     {
-        var linkEntity = await _db.Links.AddAsync(link);
+        var linkEntity = await _db.Links.AddAsync(link, cancellationToken);
         return linkEntity.Entity;
     }
 
-    public async Task<Link?> GetFirstOrDefaultLinkAsync(Expression<Func<Link, bool>> predicate)
+    public async Task<Link?> GetFirstOrDefaultLinkAsync(Expression<Func<Link, bool>> predicate, CancellationToken cancellationToken = default)
     {
-        return await _db.Links.FirstOrDefaultAsync(predicate);
+        return await _db.Links.FirstOrDefaultAsync(predicate, cancellationToken);
     }
 
-    public async Task SaveChangesAsync()
+    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task RemoveLinkAsync(Link link)
+    public async Task RemoveLinkAsync(Link link, CancellationToken cancellationToken = default)
     {
         _db.Links.Remove(link);
     }

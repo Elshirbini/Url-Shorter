@@ -21,9 +21,9 @@ public class VerifyEmailUseCase
         _redis = redis;
     }
 
-    public async Task<ApiResponse<object>> VerifyEmailAsync(VerifyEmailDto dto)
+    public async Task<ApiResponse<object>> VerifyEmailAsync(VerifyEmailDto dto, CancellationToken cancellationToken = default)
     {
-        var data = await _redis.GetAsync($"otp:{dto.Otp}") ?? throw new BadRequestException("OTP expired or invalid");
+        var data = await _redis.GetAsync($"otp:{dto.Otp}", cancellationToken) ?? throw new BadRequestException("OTP expired or invalid");
         var parsed = JsonSerializer.Deserialize<TempSignupData>(data) ?? throw new Exception("Invalid stored data");
 
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(parsed.Password);
@@ -38,9 +38,9 @@ public class VerifyEmailUseCase
             CreatedAt = DateTime.UtcNow,
         };
 
-        await _userRepository.SaveUserAsync(user);
+        await _userRepository.SaveUserAsync(user, cancellationToken);
 
-        await _redis.DeleteAsync($"otp:{dto.Otp}");
+        await _redis.DeleteAsync($"otp:{dto.Otp}", cancellationToken);
 
 
         return new ApiResponse<object>

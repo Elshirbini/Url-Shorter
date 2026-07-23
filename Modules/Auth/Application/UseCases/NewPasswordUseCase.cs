@@ -15,12 +15,12 @@ public class NewPasswordUseCase
         _userRepository = userRepository;
     }
 
-    public async Task<ApiResponse<object>> ResetPasswordAsync(NewPasswordDto dto)
+    public async Task<ApiResponse<object>> ResetPasswordAsync(NewPasswordDto dto, CancellationToken cancellationToken = default)
     {
         if (dto.Password != dto.ConfirmPassword)
             throw new BadRequestException("Passwords do not match");
 
-        var user = await _userRepository.GetFirstOrDefaultUserAsync(u => u.PasswordResetToken == dto.ResetToken) ?? throw new BadRequestException("Invalid reset token");
+        var user = await _userRepository.GetFirstOrDefaultUserAsync(u => u.PasswordResetToken == dto.ResetToken, cancellationToken) ?? throw new BadRequestException("Invalid reset token");
 
         if (user.PasswordResetTokenExpire < DateTime.UtcNow)
             throw new BadRequestException("Reset token expired");
@@ -32,7 +32,7 @@ public class NewPasswordUseCase
         user.PasswordResetToken = null;
         user.PasswordResetTokenExpire = null;
 
-        await _userRepository.SaveUserChangesAsync();
+        await _userRepository.SaveUserChangesAsync(cancellationToken);
 
         return new ApiResponse<object>
         {

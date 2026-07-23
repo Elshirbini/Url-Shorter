@@ -22,10 +22,11 @@ public class LoginUseCase
         _refreshTokenRepository = refreshTokenRepository;
     }
 
-    public async Task<ApiResponse<object>> LoginAsync(HttpContext context, LoginDto dto)
+    public async Task<ApiResponse<object>> LoginAsync(HttpContext context, LoginDto dto, CancellationToken cancellationToken = default)
     {
         var user = await _userRepository.GetFirstOrDefaultUserAsync(u =>
-                u.Email == dto.Identifier || u.UserName == dto.Identifier
+                u.Email == dto.Identifier || u.UserName == dto.Identifier,
+                cancellationToken
             ) ?? throw new UnauthorizedException("User not found");
 
         if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
@@ -39,7 +40,7 @@ public class LoginUseCase
             UserId = user.UserId,
             Jti = jti,
             ExpiresAt = DateTime.UtcNow.AddDays(7)
-        });
+        }, cancellationToken);
 
 
         context.Response.Cookies.Append("accessToken", accessToken, new CookieOptions

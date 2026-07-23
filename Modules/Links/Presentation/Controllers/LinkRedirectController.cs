@@ -16,9 +16,9 @@ public class LinkRedirectController : ControllerBase
 
     //  PUBLIC ROUTE
     [HttpGet("{code}")]
-    public async Task<IActionResult> RedirectToUrl(string code)
+    public async Task<IActionResult> RedirectToUrl(string code, CancellationToken cancellationToken)
     {
-        var result = await _redirectLinkUseCase.RedirectAsync(code, HttpContext);
+        var result = await _redirectLinkUseCase.RedirectAsync(code, HttpContext, cancellationToken);
 
         return Redirect(result);
     }

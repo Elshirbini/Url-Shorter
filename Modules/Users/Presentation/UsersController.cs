@@ -30,23 +30,24 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUser()
+    public async Task<IActionResult> GetUser(CancellationToken cancellationToken)
     {
-        var result = await _getUserUseCase.GetUserAsync(GetUserId());
+        var result = await _getUserUseCase.GetUserAsync(GetUserId(), cancellationToken);
         return Ok(result);
     }
 
     [HttpPatch]
-    public async Task<IActionResult> UpdateProfile([FromForm] UpdateUserProfileDto dto)
+    [RequestFormLimits(MultipartBodyLengthLimit = 5 * 1024 * 1024)]
+    public async Task<IActionResult> UpdateProfile([FromForm] UpdateUserProfileDto dto, CancellationToken cancellationToken)
     {
-        var result = await _updateUserProfileUseCase.UpdateProfileAsync(GetUserId(), dto);
+        var result = await _updateUserProfileUseCase.UpdateProfileAsync(GetUserId(), dto, cancellationToken);
         return Ok(result);
     }
 
     [HttpPatch("reset-password")]
-    public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
+    public async Task<IActionResult> ResetPassword(ResetPasswordDto dto, CancellationToken cancellationToken)
     {
-        var result = await _resetPasswordUseCase.ResetPasswordAsync(HttpContext, GetUserId(), dto);
+        var result = await _resetPasswordUseCase.ResetPasswordAsync(HttpContext, GetUserId(), dto, cancellationToken);
         return Ok(result);
     }
 }

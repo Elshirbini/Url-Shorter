@@ -15,9 +15,9 @@ public class CreateCategoryUseCase
         _categoryRepository = categoryRepository;
     }
 
-    public async Task<ApiResponse<object>> CreateAsync(Guid userId, CategoryDto dto)
+    public async Task<ApiResponse<object>> CreateAsync(Guid userId, CategoryDto dto, CancellationToken cancellationToken = default)
     {
-        var exists = await _categoryRepository.CategoryExistsAsync(c => c.UserId == userId && c.Name == dto.Name);
+        var exists = await _categoryRepository.CategoryExistsAsync(c => c.UserId == userId && c.Name == dto.Name, cancellationToken);
 
         if (exists)
             throw new ConflictException("Category name already exists");
@@ -28,7 +28,7 @@ public class CreateCategoryUseCase
             Name = dto.Name
         };
 
-        await _categoryRepository.CreateCategory(category);
+        await _categoryRepository.CreateCategory(category, cancellationToken);
 
         return new ApiResponse<object>
         {

@@ -18,15 +18,15 @@ public class UpdateLinkUseCase
         _categoryRepository = categoryRepository;
     }
 
-    public async Task<ApiResponse<object>> UpdateAsync(Guid userId, Guid linkId, UpdateLinkDto dto)
+    public async Task<ApiResponse<object>> UpdateAsync(Guid userId, Guid linkId, UpdateLinkDto dto, CancellationToken cancellationToken = default)
     {
-        var link = await _linkRepository.GetFirstOrDefaultLinkAsync(l => l.LinkId == linkId && l.UserId == userId)
+        var link = await _linkRepository.GetFirstOrDefaultLinkAsync(l => l.LinkId == linkId && l.UserId == userId, cancellationToken)
             ?? throw new NotFoundException("Link not found");
 
         if (!string.IsNullOrEmpty(dto.Code))
         {
             var exists = await _linkRepository
-                .ExistsByQueryAsync(l => l.Code == dto.Code && l.LinkId != linkId);
+                .ExistsByQueryAsync(l => l.Code == dto.Code && l.LinkId != linkId, cancellationToken);
 
             if (exists)
                 throw new ConflictException("Code already exists");
@@ -39,7 +39,7 @@ public class UpdateLinkUseCase
 
         if (dto.CategoryId.HasValue)
         {
-            var categoryExists = await _categoryRepository.CategoryExistsAsync(c => c.CategoryId == dto.CategoryId && c.UserId == userId);
+            var categoryExists = await _categoryRepository.CategoryExistsAsync(c => c.CategoryId == dto.CategoryId && c.UserId == userId, cancellationToken);
 
             if (!categoryExists)
                 throw new BadRequestException("Invalid category");
@@ -49,7 +49,7 @@ public class UpdateLinkUseCase
 
         link.UpdatedAt = DateTime.UtcNow;
 
-        await _linkRepository.SaveChangesAsync();
+        await _linkRepository.SaveChangesAsync(cancellationToken);
 
         return new ApiResponse<object>
         {

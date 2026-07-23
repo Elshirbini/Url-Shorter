@@ -20,9 +20,9 @@ public class ForgetPasswordUseCase
         _emailService = emailService;
     }
 
-    public async Task<ApiResponse<object>> ForgetPasswordAsync(ForgetPasswordDto dto)
+    public async Task<ApiResponse<object>> ForgetPasswordAsync(ForgetPasswordDto dto, CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.GetFirstOrDefaultUserAsync(u => u.Email == dto.Email) ?? throw new NotFoundException("User not found");
+        var user = await _userRepository.GetFirstOrDefaultUserAsync(u => u.Email == dto.Email, cancellationToken) ?? throw new NotFoundException("User not found");
 
         var code = CodeGenerator.Generate(6);
 
@@ -31,9 +31,9 @@ public class ForgetPasswordUseCase
         user.CodeValidation = hashedCode;
         user.CodeValidationExpire = DateTime.UtcNow.AddMinutes(10);
 
-        await _userRepository.SaveUserChangesAsync();
+        await _userRepository.SaveUserChangesAsync(cancellationToken);
 
-        await _emailService.SendResetPasswordAsync(user.Email, code);
+        await _emailService.SendResetPasswordAsync(user.Email, code, cancellationToken);
 
         return new ApiResponse<object>
         {

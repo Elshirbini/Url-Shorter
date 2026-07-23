@@ -5,6 +5,6 @@ namespace UrlShorter.Modules.Auth.Application.Interfaces;
 
 public interface IRefreshTokenRepository
 {
-    Task<RefreshToken?> GetFirstOrDefaultRefreshTokenAsync(Expression<Func<RefreshToken, bool>> predicate);
-    Task<RefreshToken> SaveRefreshTokenAsync(RefreshToken refreshToken);
+    Task<RefreshToken?> GetFirstOrDefaultRefreshTokenAsync(Expression<Func<RefreshToken, bool>> predicate, CancellationToken cancellationToken = default);
+    Task<RefreshToken> SaveRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default);
 }

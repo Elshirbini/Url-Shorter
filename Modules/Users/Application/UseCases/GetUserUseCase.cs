@@ -13,9 +13,9 @@ public class GetUserUseCase
         _userRepository = userRepository;
     }
 
-    public async Task<ApiResponse<object>> GetUserAsync(Guid userId)
+    public async Task<ApiResponse<object>> GetUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.GetUserByIdAsync(userId) ?? throw new NotFoundException("User not found");
+        var user = await _userRepository.GetUserByIdAsync(userId, cancellationToken) ?? throw new NotFoundException("User not found");
         return new ApiResponse<object>
         {
             Success = true,

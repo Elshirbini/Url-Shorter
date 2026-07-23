@@ -19,11 +19,11 @@ public class CreateLinkUseCase
         _categoryRepository = categoryRepository;
     }
 
-    public async Task<ApiResponse<object>> CreateAsync(Guid userId, Guid? categoryId, CreateLinkDto dto)
+    public async Task<ApiResponse<object>> CreateAsync(Guid userId, Guid? categoryId, CreateLinkDto dto, CancellationToken cancellationToken = default)
     {
         if (categoryId.HasValue)
         {
-            var categoryExists = await _categoryRepository.CategoryExistsAsync(c => c.CategoryId == categoryId && c.UserId == userId);
+            var categoryExists = await _categoryRepository.CategoryExistsAsync(c => c.CategoryId == categoryId && c.UserId == userId, cancellationToken);
 
             if (!categoryExists)
                 throw new BadRequestException("Invalid category");
@@ -35,7 +35,7 @@ public class CreateLinkUseCase
         {
             code = dto.Code;
 
-            var exists = await _linkRepository.ExistsByQueryAsync(l => l.Code == code);
+            var exists = await _linkRepository.ExistsByQueryAsync(l => l.Code == code, cancellationToken);
             if (exists)
                 throw new ConflictException("Code already exists");
         }
@@ -45,7 +45,7 @@ public class CreateLinkUseCase
             {
                 code = CodeGenerator.Generate(6);
             }
-            while (await _linkRepository.ExistsByQueryAsync(l => l.Code == code));
+            while (await _linkRepository.ExistsByQueryAsync(l => l.Code == code, cancellationToken));
         }
 
         var link = new Link
@@ -56,8 +56,8 @@ public class CreateLinkUseCase
             UserId = userId
         };
 
-        await _linkRepository.AddLinkAsync(link);
-        await _linkRepository.SaveChangesAsync();
+        await _linkRepository.AddLinkAsync(link, cancellationToken);
+        await _linkRepository.SaveChangesAsync(cancellationToken);
 
         return new ApiResponse<object>
         {

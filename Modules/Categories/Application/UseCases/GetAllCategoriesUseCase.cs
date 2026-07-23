@@ -14,14 +14,14 @@ public class GetAllCategoriesUseCase
         _categoryRepository = categoryRepository;
     }
 
-    public async Task<ApiResponse<object>> GetAllAsync(Guid userId, QueryParams query)
+    public async Task<ApiResponse<object>> GetAllAsync(Guid userId, QueryParams query, CancellationToken cancellationToken = default)
     {
         var result = await _categoryRepository.GetAllCategoriesAsync(new CategoryFilter
         {
             UserId = userId,
             Page = query.Page,
             PageSize = query.PageSize
-        });
+        }, cancellationToken);
 
         return new ApiResponse<object>
         {

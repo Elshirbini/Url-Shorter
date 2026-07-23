@@ -22,17 +22,17 @@ public class UpdateUserProfileUseCase
         _logger = logger;
     }
 
-    public async Task<ApiResponse<object>> UpdateProfileAsync(Guid userId, UpdateUserProfileDto dto)
+    public async Task<ApiResponse<object>> UpdateProfileAsync(Guid userId, UpdateUserProfileDto dto, CancellationToken cancellationToken)
     {
         string? oldImageKey = null;
 
-        var exists = await _userRepository.UserExistsAsync(u => u.UserName == dto.UserName && u.UserId != userId);
+        var exists = await _userRepository.UserExistsAsync(u => u.UserName == dto.UserName && u.UserId != userId, cancellationToken);
 
         if (exists)
             throw new ConflictException("Username already taken");
 
 
-        var user = await _userRepository.GetUserByIdAsync(userId)
+        var user = await _userRepository.GetUserByIdAsync(userId, cancellationToken)
             ?? throw new NotFoundException("User not found");
 
         if (dto.ProfileImage != null)
@@ -41,7 +41,7 @@ public class UpdateUserProfileUseCase
 
             await using var stream = dto.ProfileImage.OpenReadStream();
 
-            await FileValidationHelper.ValidateFileAsync(stream, dto.ProfileImage.Length, dto.ProfileImage.ContentType, FileTypes.Images, 5 * 1024 * 1024);
+            await FileValidationHelper.ValidateFileAsync(stream, dto.ProfileImage.Length, dto.ProfileImage.ContentType, FileTypes.Images, 5 * 1024 * 1024, cancellationToken);
 
             oldImageKey = user.ImageKey;
 
@@ -51,7 +51,7 @@ public class UpdateUserProfileUseCase
                     Key = "users/" + userId.ToString(),
                     FileContent = stream,
                     ContentType = dto.ProfileImage.ContentType
-                });
+                }, cancellationToken);
 
             user.ImageKey = result.Key;
             user.ImageUrl = result.Url;
@@ -60,13 +60,13 @@ public class UpdateUserProfileUseCase
 
         user.UserName = dto.UserName ?? user.UserName;
 
-        await _userRepository.SaveUserChangesAsync();
+        await _userRepository.SaveUserChangesAsync(cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(oldImageKey))
         {
             try
             {
-                await _storage.DeleteFileAsync(oldImageKey);
+                await _storage.DeleteFileAsync(oldImageKey, cancellationToken);
             }
             catch (Exception ex)
             {

@@ -15,38 +15,38 @@ public class UserRepository : IUserRepository
         _db = db;
     }
 
-    public async Task<User> SaveUserAsync(User user)
+    public async Task<User> SaveUserAsync(User user, CancellationToken cancellationToken = default)
     {
-        var result = await _db.Users.AddAsync(user);
-        await _db.SaveChangesAsync();
+        var result = await _db.Users.AddAsync(user, cancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
         return result.Entity;
     }
 
-    public async Task<User?> GetUserByIdAsync(Guid userId)
+    public async Task<User?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _db.Users
             .Where(u => u.UserId == userId)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
     }
-    public async Task<User?> GetUserDocByIdAsync(Guid userId)
+    public async Task<User?> GetUserDocByIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _db.Users
             .Where(u => u.UserId == userId)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<bool> UserExistsAsync(Expression<Func<User, bool>> predicate)
+    public async Task<bool> UserExistsAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default)
     {
-        return await _db.Users.AnyAsync(predicate);
+        return await _db.Users.AnyAsync(predicate, cancellationToken);
     }
 
-    public async Task<User?> GetFirstOrDefaultUserAsync(Expression<Func<User, bool>> predicate)
+    public async Task<User?> GetFirstOrDefaultUserAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default)
     {
-        return await _db.Users.FirstOrDefaultAsync(predicate);
+        return await _db.Users.FirstOrDefaultAsync(predicate, cancellationToken);
     }
 
-    public async Task SaveUserChangesAsync()
+    public async Task SaveUserChangesAsync(CancellationToken cancellationToken = default)
     {
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(cancellationToken);
     }
 }

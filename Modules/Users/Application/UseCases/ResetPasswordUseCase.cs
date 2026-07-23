@@ -14,9 +14,9 @@ public class ResetPasswordUseCase
         _userRepository = userRepository;
     }
 
-    public async Task<ApiResponse<object>> ResetPasswordAsync(HttpContext context, Guid userId, ResetPasswordDto dto)
+    public async Task<ApiResponse<object>> ResetPasswordAsync(HttpContext context, Guid userId, ResetPasswordDto dto, CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.GetUserDocByIdAsync(userId)
+        var user = await _userRepository.GetUserDocByIdAsync(userId, cancellationToken)
             ?? throw new NotFoundException("User not found");
 
         if (!BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.Password))
@@ -26,7 +26,7 @@ public class ResetPasswordUseCase
 
         user.Password = hashed;
 
-        await _userRepository.SaveUserChangesAsync();
+        await _userRepository.SaveUserChangesAsync(cancellationToken);
 
         context.Response.Cookies.Delete("accessToken");
         context.Response.Cookies.Delete("refreshToken");
