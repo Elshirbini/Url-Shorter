@@ -1,4 +1,5 @@
 using UrlShorter.Common.Exceptions;
+using UrlShorter.Common.Redis;
 using UrlShorter.Common.Responses;
 using UrlShorter.Modules.Categories.Application.Interfaces;
 using UrlShorter.Modules.Links.Application.Interfaces;
@@ -10,12 +11,14 @@ namespace UrlShorter.Modules.Links.Application.UseCases;
 public class UpdateLinkUseCase
 {
     private readonly ILinkRepository _linkRepository;
+    private readonly IRedisClient _redis;
     private readonly ICategoryRepository _categoryRepository;
 
-    public UpdateLinkUseCase(ILinkRepository linkRepository, ICategoryRepository categoryRepository)
+    public UpdateLinkUseCase(ILinkRepository linkRepository, ICategoryRepository categoryRepository, IRedisClient redis)
     {
         _linkRepository = linkRepository;
         _categoryRepository = categoryRepository;
+        _redis = redis;
     }
 
     public async Task<ApiResponse<object>> UpdateAsync(Guid userId, Guid linkId, UpdateLinkDto dto, CancellationToken cancellationToken = default)
@@ -50,6 +53,14 @@ public class UpdateLinkUseCase
         link.UpdatedAt = DateTime.UtcNow;
 
         await _linkRepository.SaveChangesAsync(cancellationToken);
+
+        var indexKey = $"links:index:{userId}";
+
+        var keys = await _redis.GetSetMembersAsync(indexKey);
+
+        await _redis.DeleteManyAsync(keys);
+
+        await _redis.RemoveSetAsync(indexKey);
 
         return new ApiResponse<object>
         {

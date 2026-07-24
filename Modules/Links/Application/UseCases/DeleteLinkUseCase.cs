@@ -1,4 +1,5 @@
 using UrlShorter.Common.Exceptions;
+using UrlShorter.Common.Redis;
 using UrlShorter.Common.Responses;
 using UrlShorter.Modules.Links.Application.Interfaces;
 
@@ -7,10 +8,12 @@ namespace UrlShorter.Modules.Links.Application.UseCases;
 public class DeleteLinkUseCase
 {
     private readonly ILinkRepository _linkRepository;
+    private readonly IRedisClient _redis;
 
-    public DeleteLinkUseCase(ILinkRepository linkRepository)
+    public DeleteLinkUseCase(ILinkRepository linkRepository, IRedisClient redis)
     {
         _linkRepository = linkRepository;
+        _redis = redis;
     }
 
     public async Task<ApiResponse<object>> DeleteAsync(Guid userId, Guid linkId, CancellationToken cancellationToken = default)
@@ -20,6 +23,14 @@ public class DeleteLinkUseCase
 
         await _linkRepository.RemoveLinkAsync(link, cancellationToken);
         await _linkRepository.SaveChangesAsync(cancellationToken);
+
+        var indexKey = $"links:index:{userId}";
+
+        var keys = await _redis.GetSetMembersAsync(indexKey);
+
+        await _redis.DeleteManyAsync(keys);
+
+        await _redis.RemoveSetAsync(indexKey);
 
         return new ApiResponse<object>
         {

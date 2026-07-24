@@ -78,6 +78,40 @@ public class RedisClient : IRedisClient
     }
 
     // ============================
+    // Sets
+    // ============================
+
+    public async Task<bool> AddToSetAsync(string key, string value)
+    {
+        return await _db.SetAddAsync(key, value);
+    }
+
+    public async Task<string[]> GetSetMembersAsync(string key)
+    {
+        RedisValue[] values = await _db.SetMembersAsync(key);
+
+        return values
+            .Select(v => v.ToString())
+            .ToArray();
+    }
+
+    public Task<long> DeleteManyAsync(IEnumerable<string> keys)
+    {
+        RedisKey[] redisKeys = keys
+            .Select(k => (RedisKey)k)
+            .ToArray();
+
+        if (redisKeys.Length == 0)
+            return Task.FromResult(0L);
+
+        return _db.KeyDeleteAsync(redisKeys);
+    }
+
+    public Task<bool> RemoveSetAsync(string key)
+    {
+        return _db.KeyDeleteAsync(key);
+    }
+    // ============================
     // Lock
     // ============================
 

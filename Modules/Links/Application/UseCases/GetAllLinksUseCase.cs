@@ -51,6 +51,8 @@ public class GetAllLinksUseCase
 
             await _redis.SetAsync<PagedResult<LinkListDto>>(cacheKey, pagedLinks, TimeSpan.FromMinutes(10));
 
+            await _redis.AddToSetAsync($"links:index:{userId}", cacheKey);
+
             return new ApiResponse<object>
             {
                 Success = true,
