@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using UrlShorter.Data;
 using StackExchange.Redis;
-using UrlShorter.Common.Services;
+using UrlShorter.Common.Redis;
 using UrlShorter.Common.Middlewares;
 using UrlShorter.Common.Emails;
 using Microsoft.AspNetCore.Mvc;
@@ -151,7 +151,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 
 // Services
-builder.Services.AddScoped<RedisService>();
+builder.Services.AddScoped<IRedisClient, RedisClient>();
 builder.Services.AddHttpClient<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddStorage(builder.Configuration);

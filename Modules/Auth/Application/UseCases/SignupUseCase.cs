@@ -2,7 +2,7 @@ using System.Text.Json;
 using UrlShorter.Common.Emails;
 using UrlShorter.Common.Exceptions;
 using UrlShorter.Common.Responses;
-using UrlShorter.Common.Services;
+using UrlShorter.Common.Redis;
 using UrlShorter.Modules.Auth.Presentation.DTOs;
 using UrlShorter.Modules.Users.Application.Interfaces;
 using UrlShorter.Modules.Users.Infrastructure.Enums;
@@ -13,9 +13,9 @@ public class SignupUseCase
 {
     private readonly IUserRepository _userRepository;
     private readonly IEmailService _emailService;
-    private readonly RedisService _redis;
+    private readonly IRedisClient _redis;
 
-    public SignupUseCase(IUserRepository userRepository, IEmailService emailService, RedisService redis)
+    public SignupUseCase(IUserRepository userRepository, IEmailService emailService, IRedisClient redis)
     {
         _userRepository = userRepository;
         _emailService = emailService;
@@ -43,9 +43,7 @@ public class SignupUseCase
         await _redis.SetAsync(
             $"otp:{otp}",
             JsonSerializer.Serialize(userData),
-            TimeSpan.FromMinutes(10),
-            cancellationToken
-        );
+            TimeSpan.FromMinutes(10));
 
         await _emailService.SendOtpAsync(dto.Email, otp, cancellationToken);
 
