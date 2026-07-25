@@ -27,4 +27,12 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     {
         return await _db.RefreshTokens.FirstOrDefaultAsync(predicate, cancellationToken);
     }
+
+    public Task<int> DeleteExpiredRefreshTokensAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return _db.RefreshTokens
+            .Where(r => r.ExpiresAt < DateTime.UtcNow)
+            .ExecuteDeleteAsync(cancellationToken);
+    }
 }

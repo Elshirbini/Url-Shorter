@@ -28,6 +28,9 @@ using UrlShorter.Extensions;
 using UrlShorter.Common.Storage;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Features;
+using Hangfire;
+using Hangfire.PostgreSql;
+using UrlShorter.Modules.Auth.Jobs;
 
 
 
@@ -49,7 +52,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("MyPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") // allowed origin
+        policy.WithOrigins("http://localhost:5173", "http://localhost:5000") // allowed origin
               .AllowCredentials()                   // allow cookies
               .AllowAnyMethod()                     // GET, POST, etc.
               .AllowAnyHeader();                    // headers
@@ -110,6 +113,19 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 
 // ✅ Database
 builder.Services.AddDatabase(builder.Configuration);
+
+
+// Hangfire
+builder.Services.AddHangfire(config =>
+{
+    config.UsePostgreSqlStorage(options =>
+    {
+        options.UseNpgsqlConnection(
+            builder.Configuration.GetConnectionString("DefaultConnection"));
+    });
+});
+
+builder.Services.AddHangfireServer();
 
 // ✅ Controllers
 builder.Services
@@ -307,8 +323,18 @@ app.UseAuthorization();
 
 app.UseRateLimiter();
 
+// Hangfire dashboard
+app.UseHangfireDashboard("/hangfire");
+
+// Register Recurring Jobs
+RecurringJob.AddOrUpdate<CleanupRefreshTokensJob>(
+    "cleanup-refresh-tokens",
+    job => job.ExecuteAsync(CancellationToken.None),
+    Cron.Daily());
+
 // ✅ Routing
 app.MapControllers();
+
 
 
 app.Run();
