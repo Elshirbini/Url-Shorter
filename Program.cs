@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using UrlShorter.Data;
 using StackExchange.Redis;
 using UrlShorter.Common.Redis;
@@ -141,6 +143,8 @@ builder.Services
             new JsonStringEnumConverter());
     });
 
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.Configure<FormOptions>(options =>
 {
