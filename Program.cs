@@ -31,6 +31,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Hangfire;
 using Hangfire.PostgreSql;
 using UrlShorter.Modules.Auth.Jobs;
+using UrlShorter.Common.Messaging.Extensions;
 
 
 
@@ -114,6 +115,9 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 // ✅ Database
 builder.Services.AddDatabase(builder.Configuration);
 
+
+// MQ
+builder.Services.AddMessaging(builder.Configuration);
 
 // Hangfire
 builder.Services.AddHangfire(config =>

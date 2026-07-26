@@ -1,5 +1,7 @@
 using System.Text.Json;
-using UrlShorter.Common.Emails;
+using MassTransit;
+using UrlShorter.Common.Messaging.Contracts;
+using UrlShorter.Modules.Emails.Enums;
 using UrlShorter.Common.Exceptions;
 using UrlShorter.Common.Responses;
 using UrlShorter.Common.Redis;
@@ -12,13 +14,13 @@ namespace UrlShorter.Modules.Auth.Application.UseCases;
 public class SignupUseCase
 {
     private readonly IUserRepository _userRepository;
-    private readonly IEmailService _emailService;
+    private readonly IPublishEndpoint _publishEndpoint;
     private readonly IRedisClient _redis;
 
-    public SignupUseCase(IUserRepository userRepository, IEmailService emailService, IRedisClient redis)
+    public SignupUseCase(IUserRepository userRepository, IPublishEndpoint publishEndpoint, IRedisClient redis)
     {
         _userRepository = userRepository;
-        _emailService = emailService;
+        _publishEndpoint = publishEndpoint;
         _redis = redis;
     }
 
@@ -45,7 +47,11 @@ public class SignupUseCase
             JsonSerializer.Serialize(userData),
             TimeSpan.FromMinutes(10));
 
-        await _emailService.SendOtpAsync(dto.Email, otp, cancellationToken);
+        await _publishEndpoint.Publish(new SendEmailMessage(
+            dto.Email,
+            EmailTemplate.SendOtpConfirmation,
+            new Dictionary<string, object?> { { "Otp", otp } }
+        ), cancellationToken);
 
 
         return new ApiResponse<object>

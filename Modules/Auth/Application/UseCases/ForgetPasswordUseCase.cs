@@ -1,4 +1,6 @@
-using UrlShorter.Common.Emails;
+using MassTransit;
+using UrlShorter.Common.Messaging.Contracts;
+using UrlShorter.Modules.Emails.Enums;
 using UrlShorter.Common.Exceptions;
 using UrlShorter.Common.Responses;
 using UrlShorter.Common.Security;
@@ -12,12 +14,12 @@ public class ForgetPasswordUseCase
 {
 
     private readonly IUserRepository _userRepository;
-    private readonly IEmailService _emailService;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public ForgetPasswordUseCase(IUserRepository userRepository, IEmailService emailService)
+    public ForgetPasswordUseCase(IUserRepository userRepository, IPublishEndpoint publishEndpoint)
     {
         _userRepository = userRepository;
-        _emailService = emailService;
+        _publishEndpoint = publishEndpoint;
     }
 
     public async Task<ApiResponse<object>> ForgetPasswordAsync(ForgetPasswordDto dto, CancellationToken cancellationToken = default)
@@ -33,7 +35,11 @@ public class ForgetPasswordUseCase
 
         await _userRepository.SaveUserChangesAsync(cancellationToken);
 
-        await _emailService.SendResetPasswordAsync(user.Email, code, cancellationToken);
+        await _publishEndpoint.Publish(new SendEmailMessage(
+            user.Email,
+            EmailTemplate.SendResetPassword,
+            new Dictionary<string, object?> { { "Code", code } }
+        ), cancellationToken);
 
         return new ApiResponse<object>
         {
