@@ -34,6 +34,7 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using UrlShorter.Modules.Auth.Jobs;
 using UrlShorter.Common.Messaging.Extensions;
+using Asp.Versioning;
 
 
 
@@ -133,6 +134,19 @@ builder.Services.AddHangfire(config =>
 
 builder.Services.AddHangfireServer();
 
+builder.Services
+    .AddApiVersioning(options =>
+    {
+        options.DefaultApiVersion = new ApiVersion(1, 0);
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.ReportApiVersions = true;
+    })
+    .AddApiExplorer(options =>
+    {
+        options.GroupNameFormat = "'v'VVV";
+        options.SubstituteApiVersionInUrl = true;
+    });
+
 // ✅ Controllers
 builder.Services
     .AddControllers()
@@ -142,6 +156,7 @@ builder.Services
         options.JsonSerializerOptions.Converters.Add(
             new JsonStringEnumConverter());
     });
+
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();

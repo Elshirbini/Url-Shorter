@@ -2,11 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using UrlShorter.Modules.Auth.Presentation.DTOs;
 using Microsoft.AspNetCore.RateLimiting;
 using UrlShorter.Modules.Auth.Application.UseCases;
+using Microsoft.AspNetCore.Authorization;
+using Asp.Versioning;
 
 namespace UrlShorter.Modules.Auth.Presentation;
 
 [ApiController]
-[Route("api/v1/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [EnableRateLimiting("auth")]
 public class AuthController : ControllerBase
 {
@@ -35,6 +38,7 @@ public class AuthController : ControllerBase
 
     // 🔐 LOGIN
     [HttpPost("login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginDto dto, CancellationToken cancellationToken)
     {
         var result = await _loginUseCase.LoginAsync(HttpContext, dto, cancellationToken);

@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,15 +8,16 @@ using UrlShorter.Modules.Users.Presentation.DTOs;
 namespace UrlShorter.Modules.Users.Presentation;
 
 [ApiController]
-[Route("api/v1/user")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
-public class UsersController : ControllerBase
+public class UserController : ControllerBase
 {
     private readonly GetUserUseCase _getUserUseCase;
     private readonly UpdateUserProfileUseCase _updateUserProfileUseCase;
     private readonly ResetPasswordUseCase _resetPasswordUseCase;
 
-    public UsersController(GetUserUseCase getUserUseCase, UpdateUserProfileUseCase updateUserProfileUseCase, ResetPasswordUseCase resetPasswordUseCase)
+    public UserController(GetUserUseCase getUserUseCase, UpdateUserProfileUseCase updateUserProfileUseCase, ResetPasswordUseCase resetPasswordUseCase)
     {
         _getUserUseCase = getUserUseCase;
         _updateUserProfileUseCase = updateUserProfileUseCase;

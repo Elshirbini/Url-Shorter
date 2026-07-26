@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,7 +9,8 @@ using UrlShorter.Modules.Links.Presentation.DTOs;
 namespace UrlShorter.Modules.Links.Presentation.Controllers;
 
 [ApiController]
-[Route("api/v1/link")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
 public class LinkController : ControllerBase
 {

@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,7 +9,8 @@ using UrlShorter.Modules.Categories.Presentation.DTOs;
 namespace UrlShorter.Modules.Categories.Presentation;
 
 [ApiController]
-[Route("api/v1/category")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
 public class CategoryController : ControllerBase
 {
