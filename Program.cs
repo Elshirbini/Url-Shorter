@@ -35,6 +35,8 @@ using Hangfire.PostgreSql;
 using UrlShorter.Modules.Auth.Jobs;
 using UrlShorter.Common.Messaging.Extensions;
 using Asp.Versioning;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
 
 
 
@@ -298,6 +300,25 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Compression providers
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+});
+
+builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+
 
 var app = builder.Build();
 
@@ -339,6 +360,10 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 
 // ✅ Global Exception Handling
 app.UseMiddleware<ExceptionMiddleware>();
+
+
+// Response Compression
+app.UseResponseCompression();
 
 // Auth
 app.UseAuthentication();

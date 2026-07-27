@@ -16,6 +16,7 @@ obj/
 # Environment / secrets
 appsettings.Development.json
 appsettings.json
+.env
 
 # Optional
 Properties/launchSettings.json
